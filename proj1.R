@@ -57,5 +57,14 @@ head(top,20)
 
 #2. zbinować to i nakreślić w funkcji timestamp
 #nie chce mi sie zastanawiac jak przepisac timestamp na unnest_tokens, więc tu lecimy calymi zdaniami
+library(scales)
+library(ggplot2)
+ggplot(df, aes(x = times)) +
+  scale_x_date(labels = date_format("%Y"), breaks = "1 year") +
+  geom_histogram(binwidth = 31) +
+  theme_bw()
 
-ggplot2(df, aes(x = times, ))
+
+
+
+
