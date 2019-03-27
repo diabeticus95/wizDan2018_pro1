@@ -42,6 +42,7 @@ unl.mssg <- unlist(messg, recursive = T)
 
 unl.mssg <- unl.mssg[unl.sender %in% 'Patryk Kowalski']
 unl.times <- unl.times[unl.sender %in% 'Patryk Kowalski']
+unl.times <- as.Date(as.POSIXct(unl.times/1000, origin="1970-01-01"))
 
 
 df <- tibble(text = unl.mssg, times = unl.times)
@@ -55,5 +56,6 @@ top <- df.words %>%
 head(top,20)
 
 #2. zbinować to i nakreślić w funkcji timestamp
+#nie chce mi sie zastanawiac jak przepisac timestamp na unnest_tokens, więc tu lecimy calymi zdaniami
 
-  
+ggplot2(df, aes(x = times, ))
