@@ -68,3 +68,41 @@ gb <- ggplot_build(g)
 bin.df <- tibble(date = as.Date(gb$data[[1]]$x, origin = "1970-01-01"), count = gb$data[[1]]$count)
 bin.df %>%
   filter(count == max(count))
+#co rekordowo daje na dzień 700 wiadomosci
+#przy średnich 200 wiadomościach na dzień
+mean(bin.df$count)/31
+
+#binowanie po dniu, ciekawe czy mam jakąś serię 0 wiadomosci
+g2 <- ggplot(df, aes(x = times)) +
+  scale_x_date(labels = date_format("%Y"), breaks = "1 year") +
+  geom_histogram(binwidth = 1) 
+gb2 <- ggplot_build(g2)
+bin.df2 <- tibble(date = as.Date(gb2$data[[1]]$x, origin = "1970-01-01"), count = gb2$data[[1]]$count)
+empty.streaks <- bin.df2 %>% 
+  filter(count == 0) %>%
+  mutate(days.diff = 0) %>%
+  select(-count)
+#zrobic roznice dni
+empty.streaks$days.diff[2:nrow(empty.streaks)] = diff(empty.streaks$date)
+findLongestStreak <- function(empty.streaks){
+  series.list <- list()
+  bool <- 0
+  series.start <- 0
+  for (row in 1:nrow(empty.streaks)){
+    if((empty.streaks[row,]$days.diff == 1) && (bool == 0)){
+      bool <- 1
+      series.start <- empty.streaks[row,]$date
+    }
+    else if ((empty.streaks[row,]$days.diff != 1) && (bool == 1)){
+      bool <- 0
+      series.list <- append(series.list, list(list(series.start, as.numeric(empty.streaks[row-1,]$date - series.start))))
+    }
+  }
+  return(series.list)
+}
+
+result <- findLongestStreak(empty.streaks)
+
+df.diffs <- tibble(date = sapply(result, function(i) i[[1]]), streak = sapply(result, function(i) i[[2]]))
+df.diffs$date <- as.Date(df.diffs$date, origin = "1970-01-01")
+#df.diffs zawiera wszystkie dni, gdzie nie pisalem na messenger przynajmniej jeden dzien z rzedu (wartosc 0 wtedy)
