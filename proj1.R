@@ -59,12 +59,12 @@ head(top,20)
 #nie chce mi sie zastanawiac jak przepisac timestamp na unnest_tokens, więc tu lecimy calymi zdaniami
 library(scales)
 library(ggplot2)
-ggplot(df, aes(x = times)) +
+g <- ggplot(df, aes(x = times)) +
   scale_x_date(labels = date_format("%Y"), breaks = "1 year") +
   geom_histogram(binwidth = 31) +
   theme_bw()
-
-
-
-
-
+#wyciągam histogram żeby znaleźć maks i min
+gb <- ggplot_build(g)
+bin.df <- tibble(date = as.Date(gb$data[[1]]$x, origin = "1970-01-01"), count = gb$data[[1]]$count)
+bin.df %>%
+  filter(count == max(count))
