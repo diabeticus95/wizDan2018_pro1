@@ -33,6 +33,13 @@ messg <- lapply(1:length(messg), function(i) {
   )
 }
 )
+messg <- lapply(messg, function(conversation) {
+  lapply(conversation, function(message) {
+    message <- iconv(message, to = "latin1", from = "UTF-8")
+    Encoding(message) <- "UTF-8"
+    message
+  })
+})
 
 ######1. najczesciej uzywane slowa#####
 stopw <- fromJSON(file = "D:\\mgr\\dyplom\\R_analysis\\stopwords.txt")
@@ -193,16 +200,15 @@ wulg.pl <- c('chuj','chuja', 'chujek', 'chuju', 'chujem', 'chujnia',
               'zapierniczający', 'zasrać', 'zasranym', 'zasrywać', 'zasrywający',
               'zesrywać', 'zesrywający', 'zjebać', 'zjebac', 'zjebał', 'zjebal',
               'zjebała', 'zjebala', 'zjebana', 'zjebią', 'zjebali', 'zjeby')
-##### ang
+###### ang #####
 wulg.en <- read.csv('https://raw.githubusercontent.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en')
 wulg <- c(as.character(wulg.en$X2g1c), wulg.pl)
   
 ile.wulg <- sapply(df$text, function(i){
-    wynik <- sum(str_detect(i, wulg))
+    wynik <- sum(str_detect(i, wulg.pl))
     return(ifelse(wynik > 0, 1, 0))
   })
-df.wulg <- df %>% 
-
+ile.wulg/length(unl.messg)
 #####2. zbinować to i nakreślić w funkcji timestamp#####
 #nie chce mi sie zastanawiac jak przepisac timestamp na unnest_tokens, więc tu lecimy calymi zdaniami
 library(scales)
